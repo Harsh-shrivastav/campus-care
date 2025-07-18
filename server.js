@@ -139,6 +139,49 @@ app.get('/api/facilities', async (req, res) => {
   }
 });
 
+// API endpoint to update an issue
+app.put('/api/issues/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status, admin_remarks, action_taken, resolved_at } = req.body;
+  
+  if (!id) {
+    return res.status(400).json({ error: 'Issue ID is required.' });
+  }
+  
+  try {
+    // Prepare update object with only provided fields
+    const updateData = {};
+    if (status !== undefined) updateData.status = status;
+    if (admin_remarks !== undefined) updateData.admin_remarks = admin_remarks;
+    if (action_taken !== undefined) updateData.action_taken = action_taken;
+    if (resolved_at !== undefined) updateData.resolved_at = resolved_at;
+    
+    // Add updated_at timestamp
+    updateData.updated_at = new Date().toISOString();
+    
+    // Update the issue in Supabase
+    const { data, error } = await supabase
+      .from('issues')
+      .update(updateData)
+      .eq('id', id)
+      .select();
+    
+    if (error) {
+      console.error('Supabase update error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    if (data && data.length > 0) {
+      res.json({ issue: data[0] });
+    } else {
+      res.status(404).json({ error: 'Issue not found.' });
+    }
+  } catch (err) {
+    console.error('Server error when updating issue:', err);
+    res.status(500).json({ error: 'Failed to update issue.' });
+  }
+});
+
 // Basic route for testing server status
 app.get('/', (req, res) => {
   res.send('Gemini Proxy Server is running!');

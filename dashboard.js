@@ -1,7 +1,7 @@
 // dashboard.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Dashboard loading...');
+    console.log('Dashboard loading...');
     
     const backButton = document.getElementById('back-button');
     const newReportButton = document.getElementById('new-report-button');
@@ -34,14 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch facilities from the database
     const loadFacilities = async () => {
         try {
-            console.log('📡 Fetching facilities from API...');
+            console.log('Fetching facilities from API...');
             const response = await fetch('http://localhost:3001/api/facilities');
             if (!response.ok) {
                 throw new Error(`Failed to fetch facilities: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('📊 Facilities data received:', data);
+            console.log('Facilities data received:', data);
             
             // Transform into a map for quick lookups
             const facilitiesMap = {};
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         roomNumber: facility.room_number
                     };
                 });
-                console.log('✅ Created facilities map with', Object.keys(facilitiesMap).length, 'entries');
+                console.log('Created facilities map with', Object.keys(facilitiesMap).length, 'entries');
             }
             
             return facilitiesMap;
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Enhanced Helper to load reports from backend API
     const loadReports = async () => {
-        console.log('📡 Fetching reports from API...');
+        console.log('Fetching reports from API...');
         
         try {
             const controller = new AbortController();
@@ -116,18 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             clearTimeout(timeoutId);
             
-            console.log('🔍 Response status:', response.status);
-            console.log('🔍 Response headers:', [...response.headers.entries()]);
+            console.log('Response status:', response.status);
+            console.log('Response headers:', [...response.headers.entries()]);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
-            console.log('📊 Raw API response:', data);
+            console.log('Raw API response:', data);
             
             if (!data.issues || !Array.isArray(data.issues)) {
-                console.warn('⚠️ Invalid data structure:', data);
+                console.warn('Invalid data structure:', data);
                 return [];
             }
             
@@ -151,28 +151,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     status: issue.status || 'Reported',
                     timestamp: issue.created_at
                 };
-                console.log('🔄 Transformed issue:', transformed);
+                console.log('Transformed issue:', transformed);
                 return transformed;
             });
             
-            console.log('✅ Successfully loaded', transformedData.length, 'reports');
+            console.log('Successfully loaded', transformedData.length, 'reports');
             return transformedData;
             
         } catch (error) {
             if (error.name === 'AbortError') {
-                console.error('❌ Request timeout');
+                console.error('Request timeout');
             } else {
-                console.error('❌ Error loading reports from backend:', error);
+                console.error('Error loading reports from backend:', error);
             }
             
             // Fallback to localStorage for backward compatibility
             try {
                 const storedReports = localStorage.getItem('menstrualHygieneReports');
                 const fallbackData = storedReports ? JSON.parse(storedReports) : [];
-                console.log('🔄 Using fallback data:', fallbackData.length, 'reports');
+                console.log('Using fallback data:', fallbackData.length, 'reports');
                 return fallbackData;
             } catch (e) {
-                console.error('❌ Error loading fallback data:', e);
+                console.error(' Error loading fallback data:', e);
                 return [];
             }
         }
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         calculateAnalytics: (reports) => {
-            console.log('🧮 calculateAnalytics called with', reports.length, 'reports');
+            console.log('calculateAnalytics called with', reports.length, 'reports');
             const analytics = {
                 today: { total: 0, critical: 0, high: 0, low: 0 },
                 week: { total: 0, critical: 0, high: 0, low: 0 },
@@ -222,11 +222,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             reports.forEach(report => {
-                console.log('📅 Processing report:', report.timestamp, 'Priority:', report.priority);
+                console.log('Processing report:', report.timestamp, 'Priority:', report.priority);
                 const priority = report.priority?.toLowerCase() || 'low';
                 
                 if (AnalyticsService.isToday(report.timestamp)) {
-                    console.log('✅ Report is from today');
+                    console.log('Report is from today');
                     analytics.today.total++;
                     if (priority === 'critical') analytics.today.critical++;
                     else if (priority === 'high') analytics.today.high++;
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (AnalyticsService.isThisWeek(report.timestamp)) {
-                    console.log('✅ Report is from this week');
+                    console.log('Report is from this week');
                     analytics.week.total++;
                     if (priority === 'critical') analytics.week.critical++;
                     else if (priority === 'high') analytics.week.high++;
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (AnalyticsService.isThisMonth(report.timestamp)) {
-                    console.log('✅ Report is from this month');
+                    console.log('Report is from this month');
                     analytics.month.total++;
                     if (priority === 'critical') analytics.month.critical++;
                     else if (priority === 'high') analytics.month.high++;
@@ -250,12 +250,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            console.log('📊 Final analytics:', analytics);
+            console.log('Final analytics:', analytics);
             return analytics;
         },
 
         calculateIssueTypeAnalytics: (reports) => {
-            console.log('📊 calculateIssueTypeAnalytics called with', reports.length, 'reports');
+            console.log('calculateIssueTypeAnalytics called with', reports.length, 'reports');
             const issueTypes = ['dirty_restroom', 'overflowing_bin', 'no_dispenser', 'no_water', 'safety_concern', 'other'];
             const analytics = {};
 
@@ -269,54 +269,54 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             reports.forEach(report => {
-                console.log('🔍 Processing report for issue type analytics:', report.issueType, report.timestamp);
+                console.log('Processing report for issue type analytics:', report.issueType, report.timestamp);
                 const issueType = report.issueType;
                 if (analytics[issueType]) {
                     analytics[issueType].total++;
                     
                     if (AnalyticsService.isToday(report.timestamp)) {
                         analytics[issueType].today++;
-                        console.log('✅ Added to today for', issueType);
+                        console.log('Added to today for', issueType);
                     }
                     
                     if (AnalyticsService.isThisWeek(report.timestamp)) {
                         analytics[issueType].week++;
-                        console.log('✅ Added to week for', issueType);
+                        console.log('Added to week for', issueType);
                     }
                     
                     if (AnalyticsService.isThisMonth(report.timestamp)) {
                         analytics[issueType].month++;
-                        console.log('✅ Added to month for', issueType);
+                        console.log('Added to month for', issueType);
                     }
                 } else {
-                    console.warn('⚠️ Unknown issue type:', issueType);
+                    console.warn('Unknown issue type:', issueType);
                 }
             });
 
-            console.log('📈 Final issue type analytics:', analytics);
+            console.log('Final issue type analytics:', analytics);
             return analytics;
         }
     };
 
     // Function to update analytics table
     const updateAnalyticsTable = (reports) => {
-        console.log('📋 updateAnalyticsTable called with', reports.length, 'reports');
+        console.log('updateAnalyticsTable called with', reports.length, 'reports');
         
         const issueAnalytics = AnalyticsService.calculateIssueTypeAnalytics(reports);
-        console.log('📊 Issue analytics calculated:', issueAnalytics);
+        console.log('Issue analytics calculated:', issueAnalytics);
         
         const tableBody = document.getElementById('analytics-table-body');
-        console.log('🔍 Table body element:', tableBody);
+        console.log('Table body element:', tableBody);
         
         if (!tableBody) {
-            console.error('❌ analytics-table-body element not found!');
+            console.error('analytics-table-body element not found!');
             return;
         }
         
         tableBody.innerHTML = '';
 
         Object.entries(issueAnalytics).forEach(([issueType, data]) => {
-            console.log('📝 Adding row for', issueType, ':', data);
+            console.log('Adding row for', issueType, ':', data);
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="issue-type-cell">${issueTypeLabels[issueType] || issueType}</td>
@@ -350,16 +350,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Enhanced Function to update analytics display
     const updateAnalytics = (reports) => {
-        console.log('📊 Updating analytics with', reports.length, 'reports');
+        console.log('Updating analytics with', reports.length, 'reports');
         
         try {
             if (!Array.isArray(reports)) {
-                console.warn('⚠️ Invalid reports data for analytics');
+                console.warn('Invalid reports data for analytics');
                 return;
             }
             
             const analytics = AnalyticsService.calculateAnalytics(reports);
-            console.log('📈 Calculated analytics:', analytics);
+            console.log('Calculated analytics:', analytics);
 
             // Update today's analytics with fallback
             const todayElements = {
@@ -403,10 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            console.log('✅ Analytics updated successfully');
+            console.log('Analytics updated successfully');
             
         } catch (error) {
-            console.error('❌ Error updating analytics:', error);
+            console.error('Error updating analytics:', error);
         }
     };
 
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Enhanced Function to render reports and update statistics
     const renderReports = async () => {
-        console.log('🎯 Starting renderReports...');
+        console.log('Starting renderReports...');
         
         try {
             // Show loading state
@@ -430,11 +430,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // First load facilities data
             try {
-                console.log('🔄 Loading facilities data...');
+                console.log('Loading facilities data...');
                 facilitiesData = await loadFacilities();
-                console.log('✅ Facilities data loaded:', Object.keys(facilitiesData).length, 'facilities');
+                console.log('Facilities data loaded:', Object.keys(facilitiesData).length, 'facilities');
             } catch (error) {
-                console.error('❌ Failed to load facilities:', error);
+                console.error('Failed to load facilities:', error);
                 // Continue with default/fallback data
             }
             
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reportsGrid.innerHTML = '';
             
             const allReports = await loadReports();
-            console.log('📋 Loaded reports:', allReports);
+            console.log('Loaded reports:', allReports);
             
             if (!Array.isArray(allReports)) {
                 throw new Error('Invalid reports data received');
@@ -451,10 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentFilterType = filterSelect.value;
             const filteredReports = ReportFilterService.filterByIssueType(allReports, currentFilterType);
             
-            console.log('🔍 Filter applied:', currentFilterType, '- Found:', filteredReports.length, 'reports');
+            console.log('Filter applied:', currentFilterType, '- Found:', filteredReports.length, 'reports');
 
             // Update analytics with all reports (not filtered)
-            console.log('📊 Updating analytics...');
+            console.log('Updating analytics...');
             updateAnalytics(allReports);
             updateAnalyticsTable(allReports);
 
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Update statistics with actual counts
-            console.log('📈 Updating statistics...');
+            console.log('Updating statistics...');
             const stats = {
                 total: allReports.length,
                 safety: allReports.filter(r => r.issueType === "safety_concern").length,
@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dispensers: allReports.filter(r => r.issueType === "no_dispenser").length
             };
             
-            console.log('📊 Calculated stats:', stats);
+            console.log('Calculated stats:', stats);
             
             totalReportsStat.textContent = stats.total;
             safetyConcernsStat.textContent = stats.safety;
@@ -491,10 +491,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 showReportsList(filteredReports, currentFilterType);
             }
             
-            console.log('✅ Dashboard updated successfully!');
+            console.log('Dashboard updated successfully!');
             
         } catch (error) {
-            console.error('❌ Error in renderReports:', error);
+            console.error('Error in renderReports:', error);
             // Show error state
             totalReportsStat.textContent = 'Error';
             safetyConcernsStat.textContent = 'Error';
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Refresh Data
             `;
             refreshButton.addEventListener('click', () => {
-                console.log('🔄 Manual refresh triggered');
+                console.log('Manual refresh triggered');
                 renderReports();
             });
             headerSection.appendChild(refreshButton);
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-refresh every 30 seconds
     const startAutoRefresh = () => {
         setInterval(() => {
-            console.log('🔄 Auto-refresh triggered');
+            console.log('Auto-refresh triggered');
             renderReports();
         }, 30000); // 30 seconds
     };
@@ -618,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Initial setup
-    console.log('🚀 Initializing dashboard...');
+    console.log('Initializing dashboard...');
     addRefreshButton();
     
     // Initial render with retry logic
@@ -628,18 +628,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         while (attempts < maxAttempts) {
             try {
-                console.log(`📡 Initialization attempt ${attempts + 1}/${maxAttempts}`);
+                console.log(`Initialization attempt ${attempts + 1}/${maxAttempts}`);
                 await renderReports();
-                console.log('✅ Dashboard initialized successfully');
+                console.log('Dashboard initialized successfully');
                 break;
             } catch (error) {
                 attempts++;
-                console.error(`❌ Initialization attempt ${attempts} failed:`, error);
+                console.error(`Initialization attempt ${attempts} failed:`, error);
                 if (attempts < maxAttempts) {
-                    console.log(`⏳ Retrying in 2 seconds...`);
+                    console.log(`Retrying in 2 seconds...`);
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 } else {
-                    console.error('❌ Failed to initialize dashboard after', maxAttempts, 'attempts');
+                    console.error('Failed to initialize dashboard after', maxAttempts, 'attempts');
                     // Show error message to user
                     if (totalReportsStat) {
                         totalReportsStat.textContent = 'Failed to load';

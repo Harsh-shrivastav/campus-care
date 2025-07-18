@@ -22,6 +22,7 @@ body {
     padding-right: 1rem;
     padding-top: 3rem;
     padding-bottom: 3rem;
+    margin-top: 5.5rem;
 }
 
 @media (min-width: 768px) {
@@ -754,4 +755,140 @@ body {
     background-color: rgba(52, 152, 219, 0.3); /* Muted blue */
     color: #ffffff;
     border: 1px solid rgba(52, 152, 219, 0.4);
+} 
+
+/* CampusCare Header Styles */
+.cc-header {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(20, 20, 40, 0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+.cc-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.cc-logo {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    object-fit: contain;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.cc-title {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.cc-header-center {
+    display: flex;
+    gap: 1.5rem;
+}
+.cc-header-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Adjust main content for fixed header */
+.container {
+    margin-top: 5.5rem;
+}
+
+/* CampusCare Hero Section */
+.cc-hero {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+.cc-main-title {
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+.cc-tagline {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+/* Report Action Section */
+.cc-report-action {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+}
+
+/* Admin Login Modal Styles */
+.cc-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,20,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+.cc-modal-content {
+    background: rgba(30,30,40,0.95);
+    border-radius: 1.25rem;
+    padding: 2.5rem 2rem 2rem 2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    min-width: 320px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#admin-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+#admin-login-form .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #444;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 1rem;
+}
+#admin-login-form .button {
+    width: 100%;
+}
+#admin-login-error {
+    color: #ff4d4f;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .cc-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 0.5rem;
+    }
+    .cc-header-center {
+        gap: 0.5rem;
+    }
+    .container {
+        margin-top: 7.5rem;
+    }
 } 

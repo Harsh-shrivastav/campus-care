@@ -158,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             successAlert.style.display = 'flex';
             setTimeout(() => {
-                successAlert.style.display = 'none';
-                window.location.href = 'dashboard.html'; // Redirect to dashboard
-            }, 2000);
+                alert('Report submitted successfully!');
+                window.location.href = 'index.html'; // Redirect to home page
+            }, 1000);
 
             // Reset form after successful submission
             reportForm.reset();

@@ -3,28 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menstrual Hygiene Reporting System</title>
+    <title>CampusCare</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Header -->
+    <header class="cc-header">
+        <div class="cc-header-left">
+            <img src="campuscare-logo.png" alt="CampusCare Logo" class="cc-logo" />
+            <span class="cc-title">CampusCare</span>
+        </div>
+        <nav class="cc-header-center">
+            <button id="home-button" class="button ghost">Home</button>
+            <button id="report-header-button" class="button ghost">Report</button>
+        </nav>
+        <div class="cc-header-right">
+            <button id="admin-login-button" class="button outline">Admin Login</button>
+        </div>
+    </header>
+
     <div class="container">
         <div class="main-content">
-            <!-- Hero Section -->
-            <div class="hero-section">
-                <h1>Menstrual Hygiene Reporting System</h1>
-                <p>Speak Without Shame. Report Without Fear.</p>
-                <p>A safe and anonymous platform to report menstrual hygiene issues in your community. Together, we can create cleaner, safer spaces for everyone.</p>
+            <!-- CampusCare Title & Tagline -->
+            <div class="cc-hero">
+                <h1 class="cc-main-title">CampusCare</h1>
+                <p class="cc-tagline">Speak Without Shame. Report Without Fear.</p>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
+            <!-- Report Button -->
+            <div class="cc-report-action">
                 <button id="report-button" class="button primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
                     Report an Issue
-                </button>
-                <button id="dashboard-button" class="button outline">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-3"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                    Admin Dashboard
                 </button>
             </div>
 
@@ -56,7 +66,21 @@
             </div>
         </div>
     </div>
-   
+
+    <!-- Admin Login Modal (hidden by default, to be implemented in JS) -->
+    <div id="admin-login-modal" class="cc-modal" style="display:none;">
+        <div class="cc-modal-content">
+            <h2>Admin Login</h2>
+            <form id="admin-login-form">
+                <input type="text" id="admin-username" placeholder="Username" class="input-field" required />
+                <input type="password" id="admin-password" placeholder="Password" class="input-field" required />
+                <button type="submit" class="button primary">Login</button>
+                <button type="button" id="admin-cancel" class="button outline">Cancel</button>
+                <div id="admin-login-error" class="error-message" style="display:none;"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html> 
