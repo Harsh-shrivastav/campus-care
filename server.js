@@ -20,6 +20,9 @@ const port = process.env.PORT || 3001; // Use port 3001 for the backend
 app.use(cors()); // Enable CORS for all origins
 app.use(bodyParser.json());
 
+// Serve static files (HTML, CSS, JS)
+app.use(express.static('.'));
+
 // Configure Gemini API
 const API_KEY = process.env.GEMINI_API_KEY;
 
@@ -113,6 +116,26 @@ app.get('/api/issues', async (req, res) => {
   } catch (err) {
     console.error('Server error:', err);
     res.status(500).json({ error: 'Failed to fetch issues.' });
+  }
+});
+
+// API endpoint to retrieve all facilities from Supabase
+app.get('/api/facilities', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('facilities')
+      .select('*')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('Supabase facilities fetch error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({ facilities: data || [] });
+  } catch (err) {
+    console.error('Server error when fetching facilities:', err);
+    res.status(500).json({ error: 'Failed to fetch facilities.' });
   }
 });
 

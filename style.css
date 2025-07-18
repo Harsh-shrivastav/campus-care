@@ -229,12 +229,38 @@ body {
     font-weight: 500;
     margin-bottom: 1rem;
     box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .button.ghost:hover {
     background-color: rgba(50, 50, 50, 0.3);
     color: #ffffff;
     box-shadow: none;
+}
+
+.button.ghost svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Loading state styles */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '...'; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
 }
 
 .alert {
@@ -355,6 +381,192 @@ body {
 
 .error-message svg {
     color: #ffffff;
+}
+
+/* Analytics Section Styles */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.analytics-card {
+    background-color: rgba(30, 30, 30, 0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analytics-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -2px rgba(0, 0, 0, 0.25);
+}
+
+.analytics-card.today {
+    border-left: 4px solid rgba(46, 204, 113, 0.6); /* Green accent */
+}
+
+.analytics-card.week {
+    border-left: 4px solid rgba(0, 173, 181, 0.6); /* Teal accent */
+}
+
+.analytics-card.month {
+    border-left: 4px solid rgba(147, 112, 219, 0.6); /* Purple accent */
+}
+
+.analytics-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.analytics-header svg {
+    color: rgba(255, 255, 255, 0.8);
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.analytics-header h3 {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+
+.analytics-count {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.analytics-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.breakdown-label {
+    color: #e0e0e0;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.breakdown-value {
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.breakdown-value.critical {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.breakdown-value.high {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #51cf66;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.breakdown-value.low {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #74c0fc;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(20, 20, 20, 0.3);
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.analytics-table th {
+    background-color: rgba(40, 40, 40, 0.5);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.analytics-table td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+}
+
+.analytics-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.analytics-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.analytics-table .issue-type-cell {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.analytics-table .count-cell {
+    text-align: center;
+    font-weight: 500;
+}
+
+.analytics-table .count-cell.has-reports {
+    color: #ffffff;
+    background-color: rgba(0, 173, 181, 0.2);
+    border-radius: 0.375rem;
+}
+
+.analytics-table .total-cell {
+    font-weight: 700;
+    color: #ffffff;
+    background-color: rgba(147, 112, 219, 0.2);
+    border-radius: 0.375rem;
+}
+
+/* Enhanced margin for better spacing */
+.mb-8 {
+    margin-bottom: 2rem;
 }
 
 /* Dashboard Page Specific Styles */

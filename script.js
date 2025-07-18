@@ -1,4 +1,4 @@
-
+// script.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const reportButton = document.getElementById('report-button');
