@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report an Issue - Menstrual Hygiene Reporting System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="header-section">
+                <button id="back-button" class="button ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    Back to Home
+                </button>
+
+                <h1>Report an Issue</h1>
+                <p>Help us improve menstrual hygiene facilities by reporting issues you encounter.</p>
+            </div>
+
+            <!-- Success Message -->
+            <div id="success-alert" class="alert success" style="display:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                <p>Report submitted successfully! Redirecting to dashboard...</p>
+            </div>
+
+            <!-- Report Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Issue Details</h2>
+                    <p class="card-description">Please provide as much detail as possible to help us address the issue effectively.</p>
+                </div>
+
+                <div class="card-content">
+                    <form id="report-form" class="space-y-6">
+                        <!-- Issue Type Selection -->
+                        <div class="form-group">
+                            <label for="issueType">Issue Type <span class="required">*</span></label>
+                            <select id="issueType" class="select-trigger">
+                                <option value="" disabled selected>Select the type of issue</option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                            <p id="issueType-error" class="error-message" style="display:none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                                <span></span>
+                            </p>
+                        </div>
+
+                        <!-- Facility Selection Dropdown -->
+                        <div class="form-group">
+                            <label for="facility_id">Facility <span class="required">*</span></label>
+                            <select id="facility_id" class="select-trigger">
+                                <option value="" disabled selected>Select a facility</option>
+                                <option value="79439a2e-63b1-4332-9832-d1569aaff861">Hygiene Station - Sports Complex</option>
+                                <option value="8cc53d64-a097-4b1f-9b6f-7607f89f9ac5">Girls' Washroom - Main Block 1F</option>
+                                <option value="e7f6dbc2-c029-4ed6-8a5b-8e9c7c8e95ce">Sanitary Pad Dispenser - Library</option>
+                            </select>
+                            <p id="facility_id-error" class="error-message" style="display:none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                                <span></span>
+                            </p>
+                        </div>
+
+                        <!-- Description Textarea -->
+                        <div class="form-group">
+                            <label for="description">Description <span class="optional">(Optional)</span></label>
+                            <textarea id="description" placeholder="Please provide additional details about the issue..." rows="4" class="textarea-field"></textarea>
+                            <p id="description-error" class="error-message" style="display:none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                                <span></span>
+                            </p>
+                        </div>
+
+                        <!-- Submit Error -->
+                        <div id="submit-error-alert" class="alert error" style="display:none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                            <p></p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" id="submit-report-button" class="button primary w-full">
+                            Submit Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="report.js"></script>
+</body>
+</html> 
