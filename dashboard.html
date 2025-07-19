@@ -5,204 +5,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Menstrual Hygiene Reporting System</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="max-w-6xl mx-auto">
-            <!-- Header -->
-            <div class="header-section">
+    <div class="dashboard-container">
+        <!-- Left Side Menu -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>CampusCare</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" data-view="overview">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    Overview
+                </a>
+                <a href="#live-reports" class="nav-item" data-view="live-reports">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                    Live Reports
+                </a>
+                <a href="#issue-resolution" class="nav-item" data-view="issue-resolution">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                    Issue Resolution
+                </a>
+                <a href="#analytics" class="nav-item" data-view="analytics">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    Analytics & Trends
+                </a>
+            </nav>
+            <div class="sidebar-footer">
                 <button id="back-button" class="button ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-                    Back to Home
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                    Logout
                 </button>
+            </div>
+        </div>
 
-                <div class="dashboard-header-content">
-                    <div>
-                        <h1>Admin Dashboard</h1>
-                        <p>Monitor and track all reported menstrual hygiene issues.</p>
-                    </div>
-                    <div class="button-group">
-                        <!-- Removed Advanced Dashboard button -->
-                        <button id="new-report-button" class="button primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                            New Report
-                        </button>
-                    </div>
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <h1>Admin Dashboard</h1>
+                    <button id="new-report-button" class="button primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-plus"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" x2="12" y1="18" y2="12"/><line x1="9" x2="15" y1="15" y2="15"/></svg>
+                        New Report
+                    </button>
                 </div>
             </div>
 
-            <!-- Time-based Analytics -->
-            <div class="card mb-8">
-                <div class="card-header">
-                    <h2 class="card-title flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up mr-2 h-5 w-5"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
-                        Report Analytics
-                    </h2>
-                    <p class="card-description">Reports breakdown by time periods</p>
-                </div>
-                <div class="card-content">
-                    <div class="analytics-grid">
-                        <div class="analytics-card today">
-                            <div class="analytics-header">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
-                                <h3>Today's Reports</h3>
+            <!-- Overview Section -->
+            <div id="overview-section" class="dashboard-section active">
+                <!-- Time-based Analytics -->
+                <div class="card mb-8">
+                    <div class="card-header">
+                        <h2 class="card-title flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up mr-2 h-5 w-5"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+                            Report Analytics
+                        </h2>
+                        <p class="card-description">Reports breakdown by time periods</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="analytics-grid">
+                            <!-- Today's Analytics -->
+                            <div class="analytics-card today">
+                                <div class="analytics-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+                                    <h3>Today's Reports</h3>
+                                </div>
+                                <div id="today-count" class="analytics-count">0</div>
+                                <div class="analytics-breakdown">
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Critical:</span>
+                                        <span id="today-critical" class="breakdown-value critical">0</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">High:</span>
+                                        <span id="today-high" class="breakdown-value high">0</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Low:</span>
+                                        <span id="today-low" class="breakdown-value low">0</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="today-count" class="analytics-count">0</div>
-                            <div class="analytics-breakdown">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Critical:</span>
-                                    <span id="today-critical" class="breakdown-value critical">0</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">High:</span>
-                                    <span id="today-high" class="breakdown-value high">0</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Low:</span>
-                                    <span id="today-low" class="breakdown-value low">0</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="analytics-card week">
-                            <div class="analytics-header">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-range"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M14 14h.01"/><path d="M18 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
-                                <h3>This Week</h3>
+                            <!-- Week's Analytics -->
+                            <div class="analytics-card week">
+                                <div class="analytics-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-range"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M14 14h.01"/><path d="M18 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+                                    <h3>This Week</h3>
+                                </div>
+                                <div id="week-count" class="analytics-count">0</div>
+                                <div class="analytics-breakdown">
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Critical:</span>
+                                        <span id="week-critical" class="breakdown-value critical">0</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">High:</span>
+                                        <span id="week-high" class="breakdown-value high">0</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Low:</span>
+                                        <span id="week-low" class="breakdown-value low">0</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="week-count" class="analytics-count">0</div>
-                            <div class="analytics-breakdown">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Critical:</span>
-                                    <span id="week-critical" class="breakdown-value critical">0</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">High:</span>
-                                    <span id="week-high" class="breakdown-value high">0</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Low:</span>
-                                    <span id="week-low" class="breakdown-value low">0</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="analytics-card month">
-                            <div class="analytics-header">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                                <h3>This Month</h3>
-                            </div>
-                            <div id="month-count" class="analytics-count">0</div>
-                            <div class="analytics-breakdown">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Critical:</span>
-                                    <span id="month-critical" class="breakdown-value critical">0</span>
+                            <!-- Month's Analytics -->
+                            <div class="analytics-card month">
+                                <div class="analytics-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                                    <h3>This Month</h3>
                                 </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">High:</span>
-                                    <span id="month-high" class="breakdown-value high">0</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Low:</span>
-                                    <span id="month-low" class="breakdown-value low">0</span>
+                                <div id="month-count" class="analytics-count">0</div>
+                                <div class="analytics-breakdown">
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Critical:</span>
+                                        <span id="month-critical" class="breakdown-value critical">0</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">High:</span>
+                                        <span id="month-high" class="breakdown-value high">0</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Low:</span>
+                                        <span id="month-low" class="breakdown-value low">0</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Detailed Analytics Table -->
-            <div class="card mb-8">
-                <div class="card-header">
-                    <h2 class="card-title flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table mr-2 h-5 w-5"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
-                        Detailed Report Breakdown
-                    </h2>
-                    <p class="card-description">Comprehensive analysis of reports by issue type and time period</p>
-                </div>
-                <div class="card-content">
-                    <div class="table-container">
-                        <table class="analytics-table">
-                            <thead>
-                                <tr>
-                                    <th>Issue Type</th>
-                                    <th>Today</th>
-                                    <th>This Week</th>
-                                    <th>This Month</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="analytics-table-body">
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
+                <!-- Detailed Report Breakdown -->
+                <div class="card mb-8">
+                    <div class="card-header">
+                        <h2 class="card-title flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table mr-2 h-5 w-5"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+                            Detailed Report Breakdown
+                        </h2>
+                        <p class="card-description">Comprehensive analysis of reports by issue type and time period</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- Issue Type Statistics -->
-            <div class="card mb-8">
-                <div class="card-header">
-                    <h2 class="card-title flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text mr-2 h-5 w-5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                        Report Statistics
-                    </h2>
-                    <p class="card-description">Overview of all submitted reports by type</p>
-                </div>
-                <div class="card-content">
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div id="total-reports" class="stat-value">0</div>
-                            <div class="stat-label">Total Reports</div>
-                        </div>
-                        <div class="stat-item">
-                            <div id="safety-concerns" class="stat-value red">0</div>
-                            <div class="stat-label">Safety Concerns</div>
-                        </div>
-                        <div class="stat-item">
-                            <div id="dirty-restrooms" class="stat-value orange">0</div>
-                            <div class="stat-label">Dirty Restrooms</div>
-                        </div>
-                        <div class="stat-item">
-                            <div id="no-dispensers" class="stat-value blue">0</div>
-                            <div class="stat-label">No Dispensers</div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table class="analytics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Issue Type</th>
+                                        <th>Today</th>
+                                        <th>This Week</th>
+                                        <th>This Month</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="analytics-table-body">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Filter Controls -->
-            <div class="filter-controls">
-                <div class="filter-label-group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter h-4 w-4 text-gray-500"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                    <span>Filter by issue type:</span>
+            <!-- Live Reports Section -->
+            <div id="live-reports-section" class="dashboard-section">
+                <!-- Filter Controls -->
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <div class="filter-label-group">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            <span>Filter by:</span>
+                        </div>
+                        <select id="status-filter" class="select-trigger">
+                            <option value="all">All Status</option>
+                            <option value="Reported">Reported</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                        <select id="priority-filter" class="select-trigger">
+                            <option value="all">All Priorities</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                        <select id="issue-type-filter" class="select-trigger">
+                            <option value="all">All Types</option>
+                            <!-- Will be populated by JavaScript -->
+                        </select>
+                    </div>
                 </div>
 
-                <select id="filter-select" class="select-trigger w-full sm:w-48">
-                    <!-- Options will be populated by JavaScript -->
-                </select>
+                <!-- Reports Grid -->
+                <div class="reports-grid" id="reports-grid">
+                    <!-- Report cards will be inserted here by JavaScript -->
+                </div>
+
+                <!-- No Reports Message -->
+                <div id="no-reports-message" class="no-data-message" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+                    <h3>No Reports Found</h3>
+                    <p>There are no reports matching your current filters.</p>
+                </div>
             </div>
 
-            <!-- Reports List -->
-            <div class="reports-list-section">
-                <div id="no-reports-message" class="card" style="display: none;">
-                    <div class="card-content text-center py-12">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text mx-auto h-12 w-12 text-gray-400 mb-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2"></h3>
-                        <p class="text-gray-600 mb-4"></p>
-                        <button id="submit-first-report-button" class="button primary" style="display: none;">
-                            Submit First Report
-                        </button>
+            <!-- Add new Issue Resolution section before closing main-content div -->
+            <div id="issue-resolution-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Issue Resolution</h2>
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <div class="filter-label-group">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                                <span>Filter by:</span>
+                            </div>
+                            <select id="resolution-status-filter" class="select-trigger">
+                                <option value="all">All Status</option>
+                                <option value="Reported">Reported</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Resolved">Resolved</option>
+                            </select>
+                            <select id="resolution-priority-filter" class="select-trigger">
+                                <option value="all">All Priorities</option>
+                                <option value="Critical">Critical</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div id="reports-container" class="space-y-4">
-                    <div class="reports-summary" style="display: none;">
-                        <h2 class="text-lg font-semibold text-gray-900"></h2>
-                        <span id="filter-badge" class="badge secondary" style="display: none;"></span>
+                <!-- Issues Table -->
+                <div class="issues-table-container">
+                    <table class="issues-table">
+                        <thead>
+                            <tr>
+                                <th>Issue Type</th>
+                                <th>Facility</th>
+                                <th>Description</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Action Remarks</th>
+                                <th>Reported On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issues-table-body">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Status Update Modal -->
+                <div id="status-update-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Update Issue Status</h3>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="status-select">New Status</label>
+                                <select id="status-select" class="select-trigger">
+                                    <option value="Reported">Reported</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Resolved">Resolved</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="action-remarks">Action Remarks</label>
+                                <textarea id="action-remarks" class="textarea-field" rows="4" placeholder="Describe the actions taken or remarks about this status update..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancel-status-update" class="button outline">Cancel</button>
+                            <button id="confirm-status-update" class="button primary">Update Status</button>
+                        </div>
                     </div>
-                    <div id="reports-grid" class="grid gap-4">
-                        <!-- Report cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Analytics & Trends Section -->
+            <div id="analytics-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Analytics & Trends</h2>
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <div class="filter-label-group">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span>Time Range:</span>
+                            </div>
+                            <select id="analytics-time-range" class="select-trigger">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                                <option value="365">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trend Analysis Cards -->
+                <div class="analytics-cards-grid">
+                    <div class="analytics-card">
+                        <h3>Resolution Time Analysis</h3>
+                        <div class="chart-container">
+                            <canvas id="resolution-time-chart"></canvas>
+                        </div>
+                        <div class="analytics-insights">
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Issue Type Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="issue-type-chart"></canvas>
+                        </div>
+                        <div class="analytics-insights">
+                            <p>Most Common Issue: <span id="most-common-issue">-</span></p>
+                            <p>Least Common Issue: <span id="least-common-issue">-</span></p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Priority Trends</h3>
+                        <div class="chart-container">
+                            <canvas id="priority-trend-chart"></canvas>
+                        </div>
+                        <div class="analytics-insights">
+                            <p>Critical Issues: <span id="critical-issues-count">-</span></p>
+                            <p>High Priority Issues: <span id="high-priority-count">-</span></p>
+                            <p>Resolution Rate: <span id="resolution-rate">-</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations Section -->
+                <div class="recommendations-section">
+                    <h3>Data-Driven Recommendations</h3>
+                    <div class="recommendations-list" id="recommendations-list">
+                        <!-- Will be populated by JavaScript -->
                     </div>
                 </div>
             </div>

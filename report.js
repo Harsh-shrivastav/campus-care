@@ -108,6 +108,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Helper to get query parameter from URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Facility ID to Location mapping
+    const facilityLocationMap = {
+        "79439ae2-5361-4332-9832-d1569aafb861": "Hygiene Station - Sports Complex",
+        "8c53dd4e-8d97-4b1f-885f-76078bf9fac6": "Girls' Washroom - Main Block 1F",
+        "e76dbc24-c029-4ed6-8a5b-86e7c8ef95ce": "Sanitary Pad Dispenser - Library"
+    };
+    const locationDisplay = document.getElementById('location-display');
+
+    function updateLocationDisplay() {
+        const selectedFacilityId = facilityIdInput.value;
+        locationDisplay.value = facilityLocationMap[selectedFacilityId] || '';
+    }
+
+    facilityIdInput.addEventListener('change', updateLocationDisplay);
+
+    // Autofill facility from QR code link
+    const facilityIdFromQR = getQueryParam('facility_id');
+    if (facilityIdFromQR) {
+        facilityIdInput.value = facilityIdFromQR;
+        facilityIdInput.dispatchEvent(new Event('change'));
+    } else {
+        updateLocationDisplay(); // Set location if facility is pre-selected
+    }
+
 
     // Form Submission
     reportForm.addEventListener('submit', async (e) => {
