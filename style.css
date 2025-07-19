@@ -128,12 +128,22 @@ body {
 }
 
 .select-trigger {
-    background-color: rgba(30, 30, 30, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    padding: 0.5rem 1rem;
+    background-color: rgba(30, 30, 30, 0.7);
+    border: 1.5px solid #00c851;
+    color: #111;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.5rem 1.2rem;
     border-radius: 0.5rem;
-    min-width: 150px;
+    min-width: 170px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.select-trigger:focus {
+    outline: none;
+    border: 2px solid #00c851;
+    box-shadow: 0 0 0 2px rgba(0,200,81,0.2);
 }
 
 /* Reports Grid */
@@ -830,7 +840,10 @@ body {
 
 .filter-label-group {
     color: #ffffff;
-    text-shadow: 0 0 5px rgba(0,0,0,0.3);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+    letter-spacing: 0.02em;
 }
 
 .filter-label-group svg {
@@ -1464,4 +1477,245 @@ body {
     .chart-container {
         height: 180px;
     }
+}
+
+/* Admin Insights Styles */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.insight-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.insight-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.insight-icon.good {
+    background: linear-gradient(135deg, #00c851, #00a844);
+    color: white;
+}
+
+.insight-icon.warning {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+}
+
+.insight-icon.info {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+}
+
+.insight-icon.success {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+}
+
+.insight-content h3 {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.insight-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.insight-description {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.leaderboard-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .leaderboard-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.leaderboard-section h3 {
+    color: #ffffff;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.facility-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.facility-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.facility-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.facility-name {
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 0.9375rem;
+}
+
+.facility-score {
+    font-weight: 700;
+    font-size: 1.125rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.facility-score.good {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.facility-score.warning {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.facility-score.danger {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-button {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    color: #ffffff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.action-button:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.action-button svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.smart-recommendation {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.smart-recommendation:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.smart-recommendation h4 {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.smart-recommendation p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.smart-recommendation.priority-high {
+    border-left: 4px solid #ff9800;
+}
+
+.smart-recommendation.priority-critical {
+    border-left: 4px solid #f44336;
+}
+
+.smart-recommendation.priority-medium {
+    border-left: 4px solid #2196f3;
+}
+
+.smart-recommendation.priority-low {
+    border-left: 4px solid #4caf50;
+} 
+
+select, .select-trigger, select#facility_id, select#issueType {
+    background-color: transparent !important;
+} 
+option {
+    color: #111;
 } 

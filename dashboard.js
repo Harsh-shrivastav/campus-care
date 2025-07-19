@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const issueTypeFilter = document.getElementById('issue-type-filter');
     const noReportsMessage = document.getElementById('no-reports-message');
     const reportsGrid = document.getElementById('reports-grid');
+    const locationFilter = document.getElementById('location-filter');
 
     // Analytics Elements
     const analyticsTableBody = document.getElementById('analytics-table-body');
@@ -57,6 +58,25 @@ document.addEventListener('DOMContentLoaded', () => {
         option.textContent = label;
         issueTypeFilter.appendChild(option);
     });
+
+    // Populate location filter
+    const populateLocationFilter = () => {
+        if (!locationFilter) return;
+        // Remove all except the first option
+        while (locationFilter.options.length > 1) {
+            locationFilter.remove(1);
+        }
+        const uniqueLocations = Object.values(facilitiesData)
+            .map(f => f.displayName)
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .sort();
+        uniqueLocations.forEach(loc => {
+            const option = document.createElement('option');
+            option.value = loc;
+            option.textContent = loc;
+            locationFilter.appendChild(option);
+        });
+    };
 
     // Facility data store
     let facilitiesData = {};
@@ -675,6 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = statusFilter.value || 'all';
         const priority = priorityFilter.value || 'all';
         const issueType = issueTypeFilter.value || 'all';
+        const location = locationFilter.value || 'all';
         
         let filteredReports = [...reports];
         
@@ -686,6 +707,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (issueType !== 'all') {
             filteredReports = filteredReports.filter(report => report.issueType === issueType);
+        }
+        if (location !== 'all') {
+            filteredReports = filteredReports.filter(report => report.location === location);
         }
         
         renderReports(filteredReports);
@@ -840,6 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusFilter.value = 'all';
         priorityFilter.value = 'all';
         issueTypeFilter.value = 'all';
+        locationFilter.value = 'all';
         resolutionStatusFilter.value = 'all';
         resolutionPriorityFilter.value = 'all';
         
@@ -848,6 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Loading facilities data...');
             facilitiesData = await loadFacilities();
             console.log('Facilities data loaded:', facilitiesData);
+            populateLocationFilter();
             
             // Then load reports
             console.log('Loading reports...');
@@ -896,7 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Filter change handlers
-    [statusFilter, priorityFilter, issueTypeFilter].forEach(filter => {
+    [statusFilter, priorityFilter, issueTypeFilter, locationFilter].forEach(filter => {
         filter.addEventListener('change', async () => {
             const reports = await loadReports();
             filterAndRenderReports(reports);
