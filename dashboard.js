@@ -1,31 +1,81 @@
 // dashboard.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Dashboard loading...');
-    
+    // Navigation Elements
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.dashboard-section');
     const backButton = document.getElementById('back-button');
     const newReportButton = document.getElementById('new-report-button');
-    const filterSelect = document.getElementById('filter-select');
-    const totalReportsStat = document.getElementById('total-reports');
-    const safetyConcernsStat = document.getElementById('safety-concerns');
-    const dirtyRestroomsStat = document.getElementById('dirty-restrooms');
-    const noDispensersStat = document.getElementById('no-dispensers');
-    const noReportsMessage = document.getElementById('no-reports-message');
-    const reportsContainer = document.getElementById('reports-container');
-    const reportsSummary = reportsContainer.querySelector('.reports-summary');
-    const reportsCountHeading = reportsSummary.querySelector('h2');
-    const filterBadge = document.getElementById('filter-badge');
-    const reportsGrid = document.getElementById('reports-grid');
-    const submitFirstReportButton = document.getElementById('submit-first-report-button');
 
-    const issueTypeLabels = {
-        all: "All Issues",
+    // Filter Elements
+    const statusFilter = document.getElementById('status-filter');
+    const priorityFilter = document.getElementById('priority-filter');
+    const issueTypeFilter = document.getElementById('issue-type-filter');
+    const noReportsMessage = document.getElementById('no-reports-message');
+    const reportsGrid = document.getElementById('reports-grid');
+    const locationFilter = document.getElementById('location-filter');
+
+    // Analytics Elements
+    const analyticsTableBody = document.getElementById('analytics-table-body');
+    const todayCount = document.getElementById('today-count');
+    const weekCount = document.getElementById('week-count');
+    const monthCount = document.getElementById('month-count');
+
+    // Add after the existing filter elements
+    const resolutionStatusFilter = document.getElementById('resolution-status-filter');
+    const resolutionPriorityFilter = document.getElementById('resolution-priority-filter');
+    const issuesTableBody = document.getElementById('issues-table-body');
+
+    // Add after the existing elements
+    const statusUpdateModal = document.getElementById('status-update-modal');
+    const closeModalButton = document.querySelector('.close-modal');
+    const cancelStatusButton = document.getElementById('cancel-status-update');
+    const confirmStatusButton = document.getElementById('confirm-status-update');
+    const statusSelect = document.getElementById('status-select');
+    const actionRemarks = document.getElementById('action-remarks');
+
+    // Add analytics elements
+    const analyticsTimeRange = document.getElementById('analytics-time-range');
+    const resolutionTimeChart = document.getElementById('resolution-time-chart');
+    const issueTypeChart = document.getElementById('issue-type-chart');
+    const facilityChart = document.getElementById('facility-chart');
+    const priorityTrendChart = document.getElementById('priority-trend-chart');
+
+    // Issue Types Configuration
+    const issueTypes = {
         dirty_restroom: "Dirty restroom",
         overflowing_bin: "Overflowing bin",
         no_dispenser: "No dispenser",
         no_water: "No water",
         safety_concern: "Safety concern",
-        other: "Other",
+        other: "Other"
+    };
+
+    // Populate issue type filter
+    Object.entries(issueTypes).forEach(([value, label]) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        issueTypeFilter.appendChild(option);
+    });
+
+    // Populate location filter
+    const populateLocationFilter = () => {
+        if (!locationFilter) return;
+        // Remove all except the first option
+        while (locationFilter.options.length > 1) {
+            locationFilter.remove(1);
+        }
+        const uniqueLocations = Object.values(facilitiesData)
+            .map(f => f.displayName)
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .sort();
+        uniqueLocations.forEach(loc => {
+            const option = document.createElement('option');
+            option.value = loc;
+            option.textContent = loc;
+            locationFilter.appendChild(option);
+        });
     };
 
     // Facility data store
@@ -34,51 +84,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch facilities from the database
     const loadFacilities = async () => {
         try {
-            console.log('📡 Fetching facilities from API...');
+            console.log('Fetching facilities from API...');
             const response = await fetch('http://localhost:3001/api/facilities');
             if (!response.ok) {
                 throw new Error(`Failed to fetch facilities: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('📊 Facilities data received:', data);
+            console.log('Facilities data received:', data);
             
             // Transform into a map for quick lookups
             const facilitiesMap = {};
             if (data && data.facilities && Array.isArray(data.facilities)) {
                 data.facilities.forEach(facility => {
-                    const displayName = `${facility.name} - ${facility.building} ${facility.floor}${facility.room_number ? ' #' + facility.room_number : ''}`;
                     facilitiesMap[facility.facility_id] = {
-                        displayName,
+                        displayName: `${facility.name} - ${facility.building} ${facility.floor}${facility.room_number ? ' #' + facility.room_number : ''}`,
                         name: facility.name,
                         building: facility.building,
                         floor: facility.floor,
                         roomNumber: facility.room_number
                     };
                 });
-                console.log('✅ Created facilities map with', Object.keys(facilitiesMap).length, 'entries');
+                console.log('Created facilities map:', facilitiesMap);
             }
             
             return facilitiesMap;
         } catch (error) {
             console.error('Error loading facilities:', error);
-            // Fallback to static mapping if API fails
+            // Return hardcoded facility data as fallback
             return {
-                "79439a2e-63b1-4332-9832-d1569aaff861": {
+                "79439ae2-5361-4332-9832-d1569aafb861": {
                     displayName: "Hygiene Station - Sports Complex",
                     name: "Hygiene Station",
                     building: "Sports Complex",
                     floor: "1F",
                     roomNumber: ""
                 },
-                "8cc53d64-a097-4b1f-9b6f-7607f89f9ac5": {
+                "8c53dd4e-8d97-4b1f-885f-76078bf9fac6": {
                     displayName: "Girls' Washroom - Main Block 1F",
                     name: "Girls' Washroom",
                     building: "Main Block",
                     floor: "1F",
                     roomNumber: ""
                 },
-                "e7f6dbc2-c029-4ed6-8a5b-8e9c7c8e95ce": {
+                "e76dbc24-c029-4ed6-8a5b-86e7c8ef95ce": {
                     displayName: "Sanitary Pad Dispenser - Library",
                     name: "Sanitary Pad Dispenser",
                     building: "Library",
@@ -89,50 +138,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Populate filter options
-    for (const [value, label] of Object.entries(issueTypeLabels)) {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = label;
-        filterSelect.appendChild(option);
-    }
-
     // Enhanced Helper to load reports from backend API
     const loadReports = async () => {
-        console.log('📡 Fetching reports from API...');
-        
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-            
-            const response = await fetch('http://localhost:3001/api/issues', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            
-            console.log('🔍 Response status:', response.status);
-            console.log('🔍 Response headers:', [...response.headers.entries()]);
+            const response = await fetch('http://localhost:3001/api/issues');
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
-            console.log('📊 Raw API response:', data);
             
             if (!data.issues || !Array.isArray(data.issues)) {
-                console.warn('⚠️ Invalid data structure:', data);
+                console.warn('Invalid data structure:', data);
                 return [];
             }
             
             // Transform backend data to match frontend format
-            const transformedData = data.issues.map(issue => {
+            return data.issues.map(issue => {
                 const facility = facilitiesData[issue.facility_id] || {
                     displayName: issue.facility_id,
                     name: 'Unknown',
@@ -140,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     floor: 'Unknown'
                 };
                 
-                const transformed = {
+                return {
                     id: issue.id,
                     issueType: issue.issue_type,
                     location: facility.displayName,
@@ -149,36 +172,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     description: issue.description || '',
                     priority: issue.priority || 'Low',
                     status: issue.status || 'Reported',
-                    timestamp: issue.created_at
+                    timestamp: issue.created_at,
+                    updated_at: issue.updated_at || null,
+                    action_remarks: issue.action_remarks || ''
                 };
-                console.log('🔄 Transformed issue:', transformed);
-                return transformed;
             });
             
-            console.log('✅ Successfully loaded', transformedData.length, 'reports');
-            return transformedData;
-            
         } catch (error) {
-            if (error.name === 'AbortError') {
-                console.error('❌ Request timeout');
-            } else {
-                console.error('❌ Error loading reports from backend:', error);
-            }
-            
-            // Fallback to localStorage for backward compatibility
-            try {
-                const storedReports = localStorage.getItem('menstrualHygieneReports');
-                const fallbackData = storedReports ? JSON.parse(storedReports) : [];
-                console.log('🔄 Using fallback data:', fallbackData.length, 'reports');
-                return fallbackData;
-            } catch (e) {
-                console.error('❌ Error loading fallback data:', e);
+            console.error('Error loading reports:', error);
                 return [];
-            }
         }
     };
 
-    // Analytics Service for time-based filtering
+    // Analytics Service
     const AnalyticsService = {
         isToday: (date) => {
             const today = new Date();
@@ -214,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         calculateAnalytics: (reports) => {
-            console.log('🧮 calculateAnalytics called with', reports.length, 'reports');
             const analytics = {
                 today: { total: 0, critical: 0, high: 0, low: 0 },
                 week: { total: 0, critical: 0, high: 0, low: 0 },
@@ -222,11 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             reports.forEach(report => {
-                console.log('📅 Processing report:', report.timestamp, 'Priority:', report.priority);
                 const priority = report.priority?.toLowerCase() || 'low';
                 
                 if (AnalyticsService.isToday(report.timestamp)) {
-                    console.log('✅ Report is from today');
                     analytics.today.total++;
                     if (priority === 'critical') analytics.today.critical++;
                     else if (priority === 'high') analytics.today.high++;
@@ -234,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (AnalyticsService.isThisWeek(report.timestamp)) {
-                    console.log('✅ Report is from this week');
                     analytics.week.total++;
                     if (priority === 'critical') analytics.week.critical++;
                     else if (priority === 'high') analytics.week.high++;
@@ -242,7 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (AnalyticsService.isThisMonth(report.timestamp)) {
-                    console.log('✅ Report is from this month');
                     analytics.month.total++;
                     if (priority === 'critical') analytics.month.critical++;
                     else if (priority === 'high') analytics.month.high++;
@@ -250,17 +251,400 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            console.log('📊 Final analytics:', analytics);
             return analytics;
-        },
+        }
+    };
 
-        calculateIssueTypeAnalytics: (reports) => {
-            console.log('📊 calculateIssueTypeAnalytics called with', reports.length, 'reports');
-            const issueTypes = ['dirty_restroom', 'overflowing_bin', 'no_dispenser', 'no_water', 'safety_concern', 'other'];
-            const analytics = {};
+    // Function to update issue status
+    const updateIssueStatus = async (issueId, status, actionRemarks) => {
+        try {
+            const response = await fetch(`http://localhost:3001/api/issues/${issueId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    status: status,
+                    action_remarks: actionRemarks
+                }),
+            });
 
-            issueTypes.forEach(type => {
-                analytics[type] = {
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update issue status');
+            }
+
+            const data = await response.json();
+            return data.issue;
+        } catch (error) {
+            console.error('Error updating issue status:', error);
+            throw error;
+        }
+    };
+
+    // Update calculateResolutionTime function
+    const calculateResolutionTime = (reports) => {
+        const resolvedReports = reports.filter(report => report.status === 'Resolved' && report.updated_at);
+        if (!resolvedReports.length) return { avg: 0, fastest: 0, slowest: 0 };
+
+        const times = resolvedReports.map(report => {
+            const start = new Date(report.created_at);
+            const end = new Date(report.updated_at);
+            return {
+                hours: (end - start) / (1000 * 60 * 60),
+                report: report
+            };
+        });
+
+        const sortedTimes = times.sort((a, b) => a.hours - b.hours);
+        const totalHours = times.reduce((sum, item) => sum + item.hours, 0);
+
+        return {
+            avg: totalHours / times.length,
+            fastest: sortedTimes[0],
+            slowest: sortedTimes[sortedTimes.length - 1]
+        };
+    };
+
+    const calculateIssueDistribution = (reports) => {
+        const distribution = {};
+        reports.forEach(report => {
+            distribution[report.issueType] = (distribution[report.issueType] || 0) + 1;
+        });
+        return distribution;
+    };
+
+    const calculateFacilityAnalysis = (reports) => {
+        const distribution = {};
+        reports.forEach(report => {
+            distribution[report.location] = (distribution[report.location] || 0) + 1;
+        });
+        return distribution;
+    };
+
+    const calculatePriorityTrends = (reports) => {
+        const trends = {
+            Critical: 0,
+            High: 0,
+            Medium: 0,
+            Low: 0
+        };
+        reports.forEach(report => {
+            trends[report.priority] = (trends[report.priority] || 0) + 1;
+        });
+        return trends;
+    };
+
+    // Update generateRecommendations function
+    const generateRecommendations = (reports) => {
+        const recommendations = [];
+        const resolutionTime = calculateResolutionTime(reports);
+        const issueDistribution = calculateIssueDistribution(reports);
+
+        // Check average resolution time
+        if (resolutionTime.avg > 48) {
+            recommendations.push({
+                priority: 'high',
+                title: 'High Resolution Time',
+                description: `Average resolution time is ${resolutionTime.avg.toFixed(1)} hours. Consider allocating more resources to speed up issue resolution.`
+            });
+        }
+
+        // Check for frequent issues
+        const mostCommonIssue = Object.entries(issueDistribution)
+            .sort(([,a], [,b]) => b - a)[0];
+        if (mostCommonIssue && mostCommonIssue[1] > reports.length * 0.3) {
+            recommendations.push({
+                priority: 'critical',
+                title: 'Recurring Issue Pattern',
+                description: `${issueTypes[mostCommonIssue[0]]} represents ${((mostCommonIssue[1] / reports.length) * 100).toFixed(1)}% of all issues. Consider preventive measures.`
+            });
+        }
+
+        return recommendations;
+    };
+
+    // Update updateCharts function
+    const updateCharts = (reports) => {
+        // Helper function to safely get chart context
+        const getChartContext = (elementId) => {
+            const canvas = document.getElementById(elementId);
+            return canvas ? canvas.getContext('2d') : null;
+        };
+
+        // Helper function to destroy existing chart
+        const destroyChart = (chartId) => {
+            const canvas = document.getElementById(chartId);
+            const chartInstance = Chart.getChart(canvas);
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+        };
+
+        // Destroy all existing charts
+        destroyChart('resolution-time-chart');
+        destroyChart('issue-type-chart');
+        destroyChart('priority-trend-chart');
+
+        // Resolution Time Chart - Now showing average resolution time per day
+        const resolutionTimeCtx = getChartContext('resolution-time-chart');
+        if (resolutionTimeCtx) {
+            // Group reports by date and calculate average resolution time
+            const dailyAverages = reports
+                .filter(report => report.status === 'Resolved' && report.updated_at)
+                .reduce((acc, report) => {
+                    const date = new Date(report.created_at).toLocaleDateString();
+                    if (!acc[date]) {
+                        acc[date] = { total: 0, count: 0 };
+                    }
+                    const resolutionTime = (new Date(report.updated_at) - new Date(report.created_at)) / (1000 * 60 * 60);
+                    acc[date].total += resolutionTime;
+                    acc[date].count += 1;
+                    return acc;
+                }, {});
+
+            const resolutionTimeData = Object.entries(dailyAverages)
+                .map(([date, data]) => ({
+                    x: new Date(date).getTime(),
+                    y: data.total / data.count // average hours for the day
+                }))
+                .sort((a, b) => a.x - b.x);
+
+            new Chart(resolutionTimeCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Average Resolution Time (hours)',
+                        data: resolutionTimeData,
+                        borderColor: '#00c851',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                displayFormats: {
+                                    day: 'MMM d, yyyy'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            },
+                            ticks: {
+                                source: 'auto',
+                                autoSkip: true
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Hours to Resolution'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return new Date(context[0].parsed.x).toLocaleDateString();
+                                },
+                                label: function(context) {
+                                    return `Average Resolution Time: ${context.parsed.y.toFixed(1)} hours`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Issue Type Distribution Chart
+        const issueTypeCtx = getChartContext('issue-type-chart');
+        if (issueTypeCtx) {
+            const issueDistribution = calculateIssueDistribution(reports);
+            
+            new Chart(issueTypeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(issueDistribution).map(type => issueTypes[type]),
+                    datasets: [{
+                        data: Object.values(issueDistribution),
+                        backgroundColor: [
+                            '#ff4444',
+                            '#ffaa00',
+                            '#00c851',
+                            '#33b5e5',
+                            '#aa66cc',
+                            '#2BBBAD'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Facility Analysis Chart
+        const facilityCtx = getChartContext('facility-chart');
+        if (facilityCtx) {
+            const facilityData = calculateFacilityAnalysis(reports);
+            
+            new Chart(facilityCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(facilityData),
+                    datasets: [{
+                        label: 'Number of Issues',
+                        data: Object.values(facilityData),
+                        backgroundColor: '#00c851'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Issues'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Priority Trends Chart
+        const priorityCtx = getChartContext('priority-trend-chart');
+        if (priorityCtx) {
+            const priorityData = calculatePriorityTrends(reports);
+            
+            new Chart(priorityCtx, {
+                type: 'radar',
+                data: {
+                    labels: Object.keys(priorityData),
+                    datasets: [{
+                        label: 'Number of Issues',
+                        data: Object.values(priorityData),
+                        backgroundColor: 'rgba(0, 200, 81, 0.2)',
+                        borderColor: '#00c851',
+                        pointBackgroundColor: '#00c851'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    // Update analytics display
+    const updateAnalytics = (reports) => {
+        const timeRange = parseInt(analyticsTimeRange?.value || '30');
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - timeRange);
+
+        const filteredReports = reports.filter(report => 
+            new Date(report.timestamp) >= cutoffDate
+        );
+
+        // Helper function to safely update element text content
+        const safeSetText = (elementId, text) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = text;
+            }
+        };
+
+        // Update counts
+        safeSetText('today-count', filteredReports.filter(report => AnalyticsService.isToday(report.timestamp)).length);
+        safeSetText('week-count', filteredReports.filter(report => AnalyticsService.isThisWeek(report.timestamp)).length);
+        safeSetText('month-count', filteredReports.filter(report => AnalyticsService.isThisMonth(report.timestamp)).length);
+        
+        // Update breakdowns
+        safeSetText('today-critical', filteredReports.filter(report => AnalyticsService.isToday(report.timestamp) && report.priority === 'Critical').length);
+        safeSetText('today-high', filteredReports.filter(report => AnalyticsService.isToday(report.timestamp) && report.priority === 'High').length);
+        safeSetText('today-low', filteredReports.filter(report => AnalyticsService.isToday(report.timestamp) && report.priority === 'Low').length);
+        
+        safeSetText('week-critical', filteredReports.filter(report => AnalyticsService.isThisWeek(report.timestamp) && report.priority === 'Critical').length);
+        safeSetText('week-high', filteredReports.filter(report => AnalyticsService.isThisWeek(report.timestamp) && report.priority === 'High').length);
+        safeSetText('week-low', filteredReports.filter(report => AnalyticsService.isThisWeek(report.timestamp) && report.priority === 'Low').length);
+        
+        safeSetText('month-critical', filteredReports.filter(report => AnalyticsService.isThisMonth(report.timestamp) && report.priority === 'Critical').length);
+        safeSetText('month-high', filteredReports.filter(report => AnalyticsService.isThisMonth(report.timestamp) && report.priority === 'High').length);
+        safeSetText('month-low', filteredReports.filter(report => AnalyticsService.isThisMonth(report.timestamp) && report.priority === 'Low').length);
+
+        // Update resolution time analysis with more details
+        const resolutionTime = calculateResolutionTime(filteredReports);
+        
+        // Update issue type distribution
+        const issueDistribution = calculateIssueDistribution(filteredReports);
+        const [mostCommon, leastCommon] = Object.entries(issueDistribution)
+            .sort(([,a], [,b]) => b - a)
+            .map(([type]) => issueTypes[type]);
+        safeSetText('most-common-issue', mostCommon || '-');
+        safeSetText('least-common-issue', leastCommon || '-');
+
+        // Update priority trends
+        const priorityTrends = calculatePriorityTrends(filteredReports);
+        safeSetText('critical-issues-count', priorityTrends.Critical || '0');
+        safeSetText('high-priority-count', priorityTrends.High || '0');
+        
+        const resolvedCount = filteredReports.filter(r => r.status === 'Resolved').length;
+        const totalCount = filteredReports.length;
+        const resolutionRate = totalCount ? 
+            ((resolvedCount / totalCount) * 100).toFixed(1) + '%' : '0%';
+        safeSetText('resolution-rate', resolutionRate);
+
+        // Update recommendations
+        const recommendations = generateRecommendations(filteredReports);
+        const recommendationsList = document.getElementById('recommendations-list');
+        if (recommendationsList) {
+            recommendationsList.innerHTML = recommendations.map(rec => `
+                <div class="recommendation-item ${rec.priority}">
+                    <h4>${rec.title}</h4>
+                    <p>${rec.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Update charts if they exist
+        try {
+            updateCharts(filteredReports);
+        } catch (error) {
+            console.warn('Error updating charts:', error);
+        }
+    };
+
+    // Update analytics table
+    const updateAnalyticsTable = (reports) => {
+        const issueTypeCounts = {};
+        
+        // Initialize counts for each issue type
+        Object.keys(issueTypes).forEach(type => {
+            issueTypeCounts[type] = {
                     today: 0,
                     week: 0,
                     month: 0,
@@ -268,308 +652,296 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
 
+        // Count reports by type and period
             reports.forEach(report => {
-                console.log('🔍 Processing report for issue type analytics:', report.issueType, report.timestamp);
-                const issueType = report.issueType;
-                if (analytics[issueType]) {
-                    analytics[issueType].total++;
+            const type = report.issueType;
+            if (issueTypeCounts[type]) {
+                issueTypeCounts[type].total++;
                     
                     if (AnalyticsService.isToday(report.timestamp)) {
-                        analytics[issueType].today++;
-                        console.log('✅ Added to today for', issueType);
+                    issueTypeCounts[type].today++;
                     }
-                    
                     if (AnalyticsService.isThisWeek(report.timestamp)) {
-                        analytics[issueType].week++;
-                        console.log('✅ Added to week for', issueType);
+                    issueTypeCounts[type].week++;
                     }
-                    
                     if (AnalyticsService.isThisMonth(report.timestamp)) {
-                        analytics[issueType].month++;
-                        console.log('✅ Added to month for', issueType);
-                    }
-                } else {
-                    console.warn('⚠️ Unknown issue type:', issueType);
+                    issueTypeCounts[type].month++;
                 }
-            });
-
-            console.log('📈 Final issue type analytics:', analytics);
-            return analytics;
-        }
+            }
+        });
+        
+        // Clear existing table content
+        analyticsTableBody.innerHTML = '';
+        
+        // Populate table
+        Object.entries(issueTypes).forEach(([type, label]) => {
+            const counts = issueTypeCounts[type];
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td class="issue-type-cell">${label}</td>
+                <td class="count-cell ${counts.today > 0 ? 'has-reports' : ''}">${counts.today}</td>
+                <td class="count-cell ${counts.week > 0 ? 'has-reports' : ''}">${counts.week}</td>
+                <td class="count-cell ${counts.month > 0 ? 'has-reports' : ''}">${counts.month}</td>
+                <td class="total-cell">${counts.total}</td>
+            `;
+            
+            analyticsTableBody.appendChild(row);
+        });
     };
 
-    // Function to update analytics table
-    const updateAnalyticsTable = (reports) => {
-        console.log('📋 updateAnalyticsTable called with', reports.length, 'reports');
+    // Filter and render reports
+    const filterAndRenderReports = (reports) => {
+        const status = statusFilter.value || 'all';
+        const priority = priorityFilter.value || 'all';
+        const issueType = issueTypeFilter.value || 'all';
+        const location = locationFilter.value || 'all';
         
-        const issueAnalytics = AnalyticsService.calculateIssueTypeAnalytics(reports);
-        console.log('📊 Issue analytics calculated:', issueAnalytics);
+        let filteredReports = [...reports];
         
-        const tableBody = document.getElementById('analytics-table-body');
-        console.log('🔍 Table body element:', tableBody);
+        if (status !== 'all') {
+            filteredReports = filteredReports.filter(report => report.status === status);
+        }
+        if (priority !== 'all') {
+            filteredReports = filteredReports.filter(report => report.priority === priority);
+        }
+        if (issueType !== 'all') {
+            filteredReports = filteredReports.filter(report => report.issueType === issueType);
+        }
+        if (location !== 'all') {
+            filteredReports = filteredReports.filter(report => report.location === location);
+        }
         
-        if (!tableBody) {
-            console.error('❌ analytics-table-body element not found!');
+        renderReports(filteredReports);
+    };
+
+    // Render reports to grid
+    const renderReports = (reports) => {
+        if (!reports.length) {
+            reportsGrid.style.display = 'none';
+            noReportsMessage.style.display = 'block';
             return;
         }
         
-        tableBody.innerHTML = '';
-
-        Object.entries(issueAnalytics).forEach(([issueType, data]) => {
-            console.log('📝 Adding row for', issueType, ':', data);
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="issue-type-cell">${issueTypeLabels[issueType] || issueType}</td>
-                <td class="count-cell ${data.today > 0 ? 'has-reports' : ''}">${data.today}</td>
-                <td class="count-cell ${data.week > 0 ? 'has-reports' : ''}">${data.week}</td>
-                <td class="count-cell ${data.month > 0 ? 'has-reports' : ''}">${data.month}</td>
-                <td class="count-cell total-cell">${data.total}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // Add totals row
-        const totals = {
-            today: Object.values(issueAnalytics).reduce((sum, data) => sum + data.today, 0),
-            week: Object.values(issueAnalytics).reduce((sum, data) => sum + data.week, 0),
-            month: Object.values(issueAnalytics).reduce((sum, data) => sum + data.month, 0),
-            total: Object.values(issueAnalytics).reduce((sum, data) => sum + data.total, 0)
-        };
-
-        const totalsRow = document.createElement('tr');
-        totalsRow.style.borderTop = '2px solid rgba(255, 255, 255, 0.2)';
-        totalsRow.innerHTML = `
-            <td class="issue-type-cell" style="font-weight: 700; color: #ffffff;">TOTAL</td>
-            <td class="count-cell total-cell">${totals.today}</td>
-            <td class="count-cell total-cell">${totals.week}</td>
-            <td class="count-cell total-cell">${totals.month}</td>
-            <td class="count-cell total-cell" style="background-color: rgba(147, 112, 219, 0.4);">${totals.total}</td>
-        `;
-        tableBody.appendChild(totalsRow);
-    };
-
-    // Enhanced Function to update analytics display
-    const updateAnalytics = (reports) => {
-        console.log('📊 Updating analytics with', reports.length, 'reports');
-        
-        try {
-            if (!Array.isArray(reports)) {
-                console.warn('⚠️ Invalid reports data for analytics');
-                return;
-            }
-            
-            const analytics = AnalyticsService.calculateAnalytics(reports);
-            console.log('📈 Calculated analytics:', analytics);
-
-            // Update today's analytics with fallback
-            const todayElements = {
-                count: document.getElementById('today-count'),
-                critical: document.getElementById('today-critical'),
-                high: document.getElementById('today-high'),
-                low: document.getElementById('today-low')
-            };
-
-            Object.entries(todayElements).forEach(([key, element]) => {
-                if (element) {
-                    element.textContent = key === 'count' ? analytics.today.total : analytics.today[key] || 0;
-                }
-            });
-
-            // Update week's analytics with fallback
-            const weekElements = {
-                count: document.getElementById('week-count'),
-                critical: document.getElementById('week-critical'),
-                high: document.getElementById('week-high'),
-                low: document.getElementById('week-low')
-            };
-
-            Object.entries(weekElements).forEach(([key, element]) => {
-                if (element) {
-                    element.textContent = key === 'count' ? analytics.week.total : analytics.week[key] || 0;
-                }
-            });
-
-            // Update month's analytics with fallback
-            const monthElements = {
-                count: document.getElementById('month-count'),
-                critical: document.getElementById('month-critical'),
-                high: document.getElementById('month-high'),
-                low: document.getElementById('month-low')
-            };
-
-            Object.entries(monthElements).forEach(([key, element]) => {
-                if (element) {
-                    element.textContent = key === 'count' ? analytics.month.total : analytics.month[key] || 0;
-                }
-            });
-            
-            console.log('✅ Analytics updated successfully');
-            
-        } catch (error) {
-            console.error('❌ Error updating analytics:', error);
-        }
-    };
-
-    // Report Filter Service (simplified version of ReportFilterService)
-    const ReportFilterService = {
-        filterByIssueType: (reports, filterType) => {
-            if (filterType === "all") {
-                return reports;
-            }
-            return reports.filter(report => report.issueType === filterType);
-        }
-    };
-
-    // Enhanced Function to render reports and update statistics
-    const renderReports = async () => {
-        console.log('🎯 Starting renderReports...');
-        
-        try {
-            // Show loading state
-            totalReportsStat.textContent = 'Loading...';
-            
-            // First load facilities data
-            try {
-                console.log('🔄 Loading facilities data...');
-                facilitiesData = await loadFacilities();
-                console.log('✅ Facilities data loaded:', Object.keys(facilitiesData).length, 'facilities');
-            } catch (error) {
-                console.error('❌ Failed to load facilities:', error);
-                // Continue with default/fallback data
-            }
-            
-            // Clear previous reports
-            reportsGrid.innerHTML = '';
-            
-            const allReports = await loadReports();
-            console.log('📋 Loaded reports:', allReports);
-            
-            if (!Array.isArray(allReports)) {
-                throw new Error('Invalid reports data received');
-            }
-            
-            const currentFilterType = filterSelect.value;
-            const filteredReports = ReportFilterService.filterByIssueType(allReports, currentFilterType);
-            
-            console.log('🔍 Filter applied:', currentFilterType, '- Found:', filteredReports.length, 'reports');
-
-            // Update analytics with all reports (not filtered)
-            console.log('📊 Updating analytics...');
-            updateAnalytics(allReports);
-            updateAnalyticsTable(allReports);
-
-            // Update UI based on filtered reports
-            if (filteredReports.length === 0) {
-                noReportsMessage.style.display = 'block';
-                reportsContainer.style.display = 'none';
-            } else {
-                showReportsList(filteredReports, currentFilterType);
-            }
-
-            // Update statistics with actual counts
-            console.log('📈 Updating statistics...');
-            const stats = {
-                total: allReports.length,
-                safety: allReports.filter(r => r.issueType === "safety_concern").length,
-                dirty: allReports.filter(r => r.issueType === "dirty_restroom").length,
-                dispensers: allReports.filter(r => r.issueType === "no_dispenser").length
-            };
-            
-            console.log('📊 Calculated stats:', stats);
-            
-            totalReportsStat.textContent = stats.total;
-            safetyConcernsStat.textContent = stats.safety;
-            dirtyRestroomsStat.textContent = stats.dirty;
-            noDispensersStat.textContent = stats.dispensers;
-            
-            // Clear previous reports
-            reportsGrid.innerHTML = '';
-
-            if (filteredReports.length === 0) {
-                showNoReportsMessage(allReports.length === 0);
-            } else {
-                showReportsList(filteredReports, currentFilterType);
-            }
-            
-            console.log('✅ Dashboard updated successfully!');
-            
-        } catch (error) {
-            console.error('❌ Error in renderReports:', error);
-            // Show error state
-            totalReportsStat.textContent = 'Error';
-            safetyConcernsStat.textContent = 'Error';
-            dirtyRestroomsStat.textContent = 'Error';
-            noDispensersStat.textContent = 'Error';
-        }
-    };
-    
-    // Helper function to show no reports message
-    const showNoReportsMessage = (noReportsAtAll) => {
-        noReportsMessage.style.display = 'block';
-        reportsContainer.style.display = 'none';
-        
-        if (noReportsAtAll) {
-            noReportsMessage.querySelector('h3').textContent = "No reports yet";
-            noReportsMessage.querySelector('p').textContent = "Be the first to report a menstrual hygiene issue in your community.";
-            submitFirstReportButton.style.display = 'block';
-        } else {
-            noReportsMessage.querySelector('h3').textContent = "No reports match your filter";
-            noReportsMessage.querySelector('p').textContent = "Try adjusting your filter to see more reports.";
-            submitFirstReportButton.style.display = 'none';
-        }
-    };
-    
-    // Helper function to show reports list
-    const showReportsList = (filteredReports, currentFilterType) => {
+        reportsGrid.style.display = 'grid';
         noReportsMessage.style.display = 'none';
-        reportsContainer.style.display = 'block';
+            reportsGrid.innerHTML = '';
+            
+        reports.forEach(report => {
+            const card = document.createElement('div');
+            card.className = 'report-card';
+            
+            const priorityClass = report.priority.toLowerCase();
+            const statusClass = report.status.toLowerCase().replace(' ', '-');
+            
+            card.innerHTML = `
+                <div class="report-card-header">
+                    <div class="report-card-title">${issueTypes[report.issueType]}</div>
+                    <div class="report-card-timestamp">${new Date(report.timestamp).toLocaleString()}</div>
+                </div>
+                <div class="report-card-location">${report.location}</div>
+                <div class="report-card-description">${report.description || 'No description provided.'}</div>
+                <div class="report-card-badges">
+                    <span class="badge priority-${priorityClass}">${report.priority}</span>
+                    <span class="badge status-${statusClass}">${report.status}</span>
+                </div>
+            `;
+            
+            reportsGrid.appendChild(card);
+        });
+    };
 
-        reportsCountHeading.textContent = `Reports (${filteredReports.length})`;
-        reportsSummary.style.display = 'flex';
-
-        if (currentFilterType !== "all") {
-            filterBadge.textContent = `Filtered by: ${issueTypeLabels[currentFilterType]}`;
-            filterBadge.style.display = 'inline-block';
-        } else {
-            filterBadge.style.display = 'none';
+    // Function to render issues table
+    const renderIssuesTable = (reports) => {
+        const status = resolutionStatusFilter.value || 'all';
+        const priority = resolutionPriorityFilter.value || 'all';
+        
+        let filteredReports = [...reports];
+        
+        if (status !== 'all') {
+            filteredReports = filteredReports.filter(report => report.status === status);
         }
+        if (priority !== 'all') {
+            filteredReports = filteredReports.filter(report => report.priority === priority);
+        }
+        
+        issuesTableBody.innerHTML = '';
 
         filteredReports.forEach(report => {
-            const reportCard = document.createElement('div');
-            reportCard.className = 'report-card';
+            const tr = document.createElement('tr');
+            const statusClass = report.status.toLowerCase().replace(' ', '-');
             
-            const formattedDate = new Date(report.timestamp).toLocaleString();
-            const priorityClass = report.priority ? report.priority.toLowerCase() : 'low';
-            
-            // Format facility details
-            const facility = report.facilityDetails || {};
-            const facilityDetails = `
-                <div class="facility-details">
-                    <p><strong>Building:</strong> ${facility.building || 'Unknown'}</p>
-                    <p><strong>Floor:</strong> ${facility.floor || 'Unknown'}</p>
-                    ${facility.roomNumber ? `<p><strong>Room:</strong> ${facility.roomNumber}</p>` : ''}
-                </div>
+            tr.innerHTML = `
+                <td>${issueTypes[report.issueType]}</td>
+                <td>${report.location}</td>
+                <td>${report.description || 'No description provided'}</td>
+                <td>
+                    <span class="priority-badge ${report.priority.toLowerCase()}">${report.priority}</span>
+                </td>
+                <td>
+                    <span class="status-badge ${statusClass}">${report.status}</span>
+                </td>
+                <td>${report.action_remarks || '-'}</td>
+                <td>${new Date(report.timestamp).toLocaleString()}</td>
+                <td>
+                    <button class="action-button update-status" data-issue-id="${report.id}" data-current-status="${report.status}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                </td>
             `;
             
-            reportCard.innerHTML = `
-                <div class="report-card-header">
-                    <h3 class="report-card-title">Issue: ${issueTypeLabels[report.issueType] || report.issueType}</h3>
-                    <span class="report-card-timestamp">${formattedDate}</span>
-                </div>
-                <p class="report-card-location"><strong>Location:</strong> ${report.location}</p>
-                ${facilityDetails}
-                ${report.description ? `<p class="report-card-description"><strong>Description:</strong> ${report.description}</p>` : ''}
-                ${report.priority ? `<p class="report-card-priority"><strong>Priority:</strong> <span class="priority-badge priority-${priorityClass}">${report.priority}</span></p>` : ''}
-                <div class="report-card-badges">
-                    <span class="badge issue-type">${issueTypeLabels[report.issueType] || report.issueType}</span>
-                    ${report.status ? `<span class="badge status">${report.status}</span>` : ''}
-                </div>
-            `;
-            reportsGrid.appendChild(reportCard);
+            issuesTableBody.appendChild(tr);
         });
+        
+        // Add event listeners to update status buttons
+        document.querySelectorAll('.update-status').forEach(button => {
+            button.addEventListener('click', () => {
+                const issueId = button.dataset.issueId;
+                const currentStatus = button.dataset.currentStatus;
+                openStatusUpdateModal(issueId, currentStatus);
+            });
+        });
+    };
+
+    // Modal handling functions
+    let currentIssueId = null;
+
+    const openStatusUpdateModal = (issueId, currentStatus) => {
+        currentIssueId = issueId;
+        statusSelect.value = currentStatus;
+        actionRemarks.value = '';
+        statusUpdateModal.style.display = 'flex';
+    };
+
+    const closeStatusUpdateModal = () => {
+        statusUpdateModal.style.display = 'none';
+        currentIssueId = null;
+        actionRemarks.value = '';
+    };
+
+    // Update confirmStatusButton click handler
+    confirmStatusButton.addEventListener('click', async () => {
+        if (!currentIssueId) return;
+        
+        try {
+            confirmStatusButton.disabled = true;
+            confirmStatusButton.textContent = 'Updating...';
+            
+            const newStatus = statusSelect.value;
+            const remarks = actionRemarks.value.trim();
+            
+            if (!newStatus) {
+                throw new Error('Please select a status');
+            }
+            
+            await updateIssueStatus(currentIssueId, newStatus, remarks);
+            closeStatusUpdateModal();
+            
+            // Refresh the data
+            const reports = await loadReports();
+            updateAnalytics(reports);
+            updateAnalyticsTable(reports);
+            renderIssuesTable(reports);
+            filterAndRenderReports(reports);
+            
+        } catch (error) {
+            alert(error.message || 'Failed to update issue status. Please try again.');
+        } finally {
+            confirmStatusButton.disabled = false;
+            confirmStatusButton.textContent = 'Update Status';
+        }
+    });
+
+    // Add analytics time range change handler
+    analyticsTimeRange.addEventListener('change', async () => {
+        const reports = await loadReports();
+        updateAnalytics(reports);
+    });
+
+    // Initialize dashboard
+    const initializeDashboard = async () => {
+        // Set default filter values
+        statusFilter.value = 'all';
+        priorityFilter.value = 'all';
+        issueTypeFilter.value = 'all';
+        locationFilter.value = 'all';
+        resolutionStatusFilter.value = 'all';
+        resolutionPriorityFilter.value = 'all';
+        
+        try {
+            // Load facilities data first
+            console.log('Loading facilities data...');
+            facilitiesData = await loadFacilities();
+            console.log('Facilities data loaded:', facilitiesData);
+            populateLocationFilter();
+            
+            // Then load reports
+            console.log('Loading reports...');
+            const reports = await loadReports();
+            console.log('Reports loaded:', reports);
+            
+            // Update analytics
+            updateAnalytics(reports);
+            updateAnalyticsTable(reports);
+            
+            // Render initial reports
+            filterAndRenderReports(reports);
+            renderIssuesTable(reports);
+            
+            // Setup auto-refresh
+            setInterval(async () => {
+                const updatedReports = await loadReports();
+                updateAnalytics(updatedReports);
+                updateAnalyticsTable(updatedReports);
+                filterAndRenderReports(updatedReports);
+                renderIssuesTable(updatedReports);
+            }, 30000); // Refresh every 30 seconds
+        } catch (error) {
+            console.error('Error initializing dashboard:', error);
+        }
     };
 
     // Event Listeners
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetView = item.getAttribute('data-view');
+            
+            // Update active states
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Show selected section
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === `${targetView}-section`) {
+                    section.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // Filter change handlers
+    [statusFilter, priorityFilter, issueTypeFilter, locationFilter].forEach(filter => {
+        filter.addEventListener('change', async () => {
+            const reports = await loadReports();
+            filterAndRenderReports(reports);
+        });
+    });
+
+    // Resolution filter handlers
+    [resolutionStatusFilter, resolutionPriorityFilter].forEach(filter => {
+        filter.addEventListener('change', async () => {
+            const reports = await loadReports();
+            renderIssuesTable(reports);
+        });
+    });
+
+    // Modal event listeners
+    closeModalButton.addEventListener('click', closeStatusUpdateModal);
+    cancelStatusButton.addEventListener('click', closeStatusUpdateModal);
+
+    // Navigation handlers
     backButton.addEventListener('click', () => {
         window.location.href = 'index.html';
     });
@@ -578,78 +950,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'report.html';
     });
 
-    filterSelect.addEventListener('change', renderReports);
-    submitFirstReportButton.addEventListener('click', () => {
-        window.location.href = 'report.html';
-    });
-    
-    // Add refresh button functionality
-    const addRefreshButton = () => {
-        const headerSection = document.querySelector('.header-section');
-        if (headerSection && !document.getElementById('refresh-button')) {
-            const refreshButton = document.createElement('button');
-            refreshButton.id = 'refresh-button';
-            refreshButton.className = 'button ghost';
-            refreshButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                    <path d="M3 21v-5h5"/>
-                </svg>
-                Refresh Data
-            `;
-            refreshButton.addEventListener('click', () => {
-                console.log('🔄 Manual refresh triggered');
-                renderReports();
-            });
-            headerSection.appendChild(refreshButton);
-        }
-    };
-
-    // Auto-refresh every 30 seconds
-    const startAutoRefresh = () => {
-        setInterval(() => {
-            console.log('🔄 Auto-refresh triggered');
-            renderReports();
-        }, 30000); // 30 seconds
-    };
-
-
-
-    // Initial setup
-    console.log('🚀 Initializing dashboard...');
-    addRefreshButton();
-    
-    // Initial render with retry logic
-    const initializeDashboard = async () => {
-        let attempts = 0;
-        const maxAttempts = 3;
-        
-        while (attempts < maxAttempts) {
-            try {
-                console.log(`📡 Initialization attempt ${attempts + 1}/${maxAttempts}`);
-                await renderReports();
-                console.log('✅ Dashboard initialized successfully');
-                break;
-            } catch (error) {
-                attempts++;
-                console.error(`❌ Initialization attempt ${attempts} failed:`, error);
-                if (attempts < maxAttempts) {
-                    console.log(`⏳ Retrying in 2 seconds...`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                } else {
-                    console.error('❌ Failed to initialize dashboard after', maxAttempts, 'attempts');
-                    // Show error message to user
-                    if (totalReportsStat) {
-                        totalReportsStat.textContent = 'Failed to load';
-                    }
-                }
-            }
-        }
-    };
-    
-    // Start initialization and auto-refresh
+    // Initialize the dashboard
     initializeDashboard();
-    startAutoRefresh();
 }); 

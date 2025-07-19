@@ -1,24 +1,23 @@
-// API endpoint to insert a new issue into Supabase
+// server.js
+import express from 'express';
+import cors from 'cors';
+import { config } from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+config();
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { createClient } = require('@supabase/supabase-js');
+const app = express();
+const port = process.env.PORT || 3001;
 
 // Supabase config
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://tbyktsmtfzqvxoibhusv.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRieWt0c210ZnpxdnhvaWJodXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MDUxMTQsImV4cCI6MjA2ODI4MTExNH0.HxC38CbyAHnBpNpGoTTCHHMOP1p3A-A1rHbv1Jsb6Fg';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const app = express();
-const port = process.env.PORT || 3001; // Use port 3001 for the backend
-
 // Middleware
 app.use(cors()); // Enable CORS for all origins
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static('.'));
@@ -121,21 +120,109 @@ app.get('/api/issues', async (req, res) => {
 
 // API endpoint to retrieve all facilities from Supabase
 app.get('/api/facilities', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('facilities')
-      .select('*')
-      .order('name', { ascending: true });
+    try {
+        console.log('Fetching facilities from Supabase...');
+        const { data, error } = await supabase
+            .from('facilities')
+            .select('*')
+            .order('name', { ascending: true });
 
+        if (error) {
+            console.error('Supabase facilities fetch error:', error);
+            // Return hardcoded data as fallback
+            return res.json({
+                facilities: [
+                    {
+                        facility_id: "79439ae2-5361-4332-9832-d1569aafb861",
+                        name: "Hygiene Station",
+                        building: "Sports Complex",
+                        floor: "1F",
+                        room_number: null
+                    },
+                    {
+                        facility_id: "8c53dd4e-8d97-4b1f-885f-76078bf9fac6",
+                        name: "Girls' Washroom",
+                        building: "Main Block",
+                        floor: "1F",
+                        room_number: null
+                    },
+                    {
+                        facility_id: "e76dbc24-c029-4ed6-8a5b-86e7c8ef95ce",
+                        name: "Sanitary Pad Dispenser",
+                        building: "Library",
+                        floor: "Ground",
+                        room_number: null
+                    }
+                ]
+            });
+        }
+
+        console.log('Facilities data from Supabase:', data);
+        res.json({ facilities: data || [] });
+    } catch (err) {
+        console.error('Server error when fetching facilities:', err);
+        // Return hardcoded data as fallback
+        res.json({
+            facilities: [
+                {
+                    facility_id: "79439ae2-5361-4332-9832-d1569aafb861",
+                    name: "Hygiene Station",
+                    building: "Sports Complex",
+                    floor: "1F",
+                    room_number: null
+                },
+                {
+                    facility_id: "8c53dd4e-8d97-4b1f-885f-76078bf9fac6",
+                    name: "Girls' Washroom",
+                    building: "Main Block",
+                    floor: "1F",
+                    room_number: null
+                },
+                {
+                    facility_id: "e76dbc24-c029-4ed6-8a5b-86e7c8ef95ce",
+                    name: "Sanitary Pad Dispenser",
+                    building: "Library",
+                    floor: "Ground",
+                    room_number: null
+                }
+            ]
+        });
+    }
+});
+
+// API endpoint to update an issue
+app.put('/api/issues/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status, action_remarks } = req.body;
+  
+  if (!id) {
+    return res.status(400).json({ error: 'Issue ID is required.' });
+  }
+  
+  try {
+    // Update the issue in Supabase
+    const { data, error } = await supabase
+      .from('issues')
+      .update({
+        status: status,
+        action_remarks: action_remarks
+      })
+      .eq('id', id)
+      .select();
+    
     if (error) {
-      console.error('Supabase facilities fetch error:', error);
+      console.error('Supabase update error:', error);
       return res.status(500).json({ error: error.message });
     }
-
-    res.json({ facilities: data || [] });
+    
+    if (data && data.length > 0) {
+      res.json({ issue: data[0] });
+    } else {
+      res.status(404).json({ error: 'Issue not found.' });
+    }
   } catch (err) {
-    console.error('Server error when fetching facilities:', err);
-    res.status(500).json({ error: 'Failed to fetch facilities.' });
+    console.error('Server error when updating issue:', err);
+    res.status(500).json({ error: 'Failed to update issue.' });
   }
 });
 
