@@ -4,7 +4,240 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusCare</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #a259f7;
+            --secondary: #5ad2ff;
+            --accent: #23223a;
+            --glass-bg: rgba(34, 30, 48, 0.55);
+            --glass-bg-strong: rgba(34, 30, 48, 0.82);
+            --glass-border: rgba(162, 89, 247, 0.18);
+            --glass-blur: 18px;
+            --text-main: #f3e9ff;
+            --text-muted: #b8b3c9;
+            --error: #ff5e7e;
+            --focus: #fff2;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(120deg, #23223a 0%, #2d1e4a 100%);
+            color: var(--text-main);
+            margin: 0;
+            letter-spacing: 0.01em;
+        }
+        .cc-header {
+            background: var(--glass-bg-strong);
+            box-shadow: 0 4px 32px rgba(162,89,247,0.13);
+            border-bottom: 1.5px solid var(--glass-border);
+            border-radius: 0 0 28px 28px;
+            padding: 1.1rem 2.5rem 0.9rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(var(--glass-blur));
+        }
+        .cc-logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .cc-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: 0.04em;
+        }
+        .button {
+            font-family: inherit;
+            border: none;
+            border-radius: 10px;
+            padding: 0.8em 1.8em;
+            font-size: 1.08rem;
+            cursor: pointer;
+            transition: box-shadow 0.18s, background 0.18s, color 0.18s, border 0.18s;
+            font-weight: 600;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(162,89,247,0.08);
+        }
+        .button.primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            box-shadow: 0 2px 12px rgba(162,89,247,0.13);
+            border: 1.5px solid transparent;
+        }
+        .button.primary:hover, .button.primary:focus {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
+            color: #fff;
+            border: 1.5px solid var(--primary);
+            box-shadow: 0 4px 18px rgba(162,89,247,0.18);
+        }
+        .button.ghost {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--glass-border);
+        }
+        .button.ghost:hover, .button.ghost:focus {
+            background: var(--glass-bg);
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+        .button.outline {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+        .button.outline:hover, .button.outline:focus {
+            background: var(--glass-bg);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .cc-hero {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+        .cc-main-title {
+            font-size: 2.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+        .cc-tagline {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+        .cc-report-action {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.2rem;
+        }
+        .feature-highlights {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin: 2rem 0 3rem 0;
+            flex-wrap: wrap;
+        }
+        .feature-card {
+            background: var(--glass-bg);
+            border-radius: 22px;
+            box-shadow: 0 4px 32px rgba(162,89,247,0.13);
+            padding: 2.2rem 1.7rem 1.7rem 1.7rem;
+            min-width: 220px;
+            max-width: 320px;
+            flex: 1 1 220px;
+            text-align: center;
+            border: 1.5px solid var(--glass-border);
+            backdrop-filter: blur(var(--glass-blur));
+            transition: box-shadow 0.18s, border 0.18s, background 0.18s;
+        }
+        .feature-card:hover, .feature-card:focus-within {
+            box-shadow: 0 8px 40px rgba(162,89,247,0.22);
+            border: 1.5px solid var(--primary);
+            background: rgba(34, 30, 48, 0.68);
+        }
+        .icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            margin: 0 auto 1rem auto;
+            box-shadow: 0 2px 8px rgba(90,210,255,0.10);
+        }
+        .icon-container.purple {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        .icon-container.pink {
+            background: linear-gradient(135deg, #f357a8 0%, #a259f7 100%);
+        }
+        .icon-container.blue {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        }
+        .blue-circle {
+            width: 24px;
+            height: 24px;
+            background: var(--secondary);
+            border-radius: 50%;
+        }
+        .cc-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(34, 30, 48, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(6px);
+        }
+        .cc-modal-content {
+            background: var(--glass-bg-strong);
+            border-radius: 22px;
+            box-shadow: 0 8px 48px rgba(162,89,247,0.22);
+            padding: 2.7rem 2.2rem 2.2rem 2.2rem;
+            min-width: 340px;
+            max-width: 95vw;
+            border: 1.5px solid var(--glass-border);
+            color: var(--text-main);
+            backdrop-filter: blur(var(--glass-blur));
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.8em 1.1em;
+            margin-bottom: 1.2em;
+            border: 1.5px solid var(--glass-border);
+            border-radius: 10px;
+            font-size: 1.08rem;
+            background: rgba(44, 38, 66, 0.45);
+            color: var(--text-main);
+            transition: border 0.18s, background 0.18s, box-shadow 0.18s;
+        }
+        .input-field:focus {
+            border: 1.5px solid var(--primary);
+            outline: none;
+            background: rgba(44, 38, 66, 0.65);
+            box-shadow: 0 0 0 2px var(--focus);
+        }
+        .error-message {
+            color: var(--error);
+            font-size: 0.98rem;
+            margin-top: 0.7em;
+            letter-spacing: 0.01em;
+        }
+        @media (max-width: 900px) {
+            .feature-highlights {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        @media (max-width: 600px) {
+            .cc-header {
+                flex-direction: column;
+                padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+            }
+            .feature-card {
+                min-width: 94vw;
+                padding: 1.3rem 0.7rem 1.1rem 0.7rem;
+            }
+            .cc-modal-content {
+                min-width: 94vw;
+                padding: 1.3rem 0.7rem 1.1rem 0.7rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -69,13 +302,15 @@
 
     <!-- Admin Login Modal (hidden by default, to be implemented in JS) -->
     <div id="admin-login-modal" class="cc-modal" style="display:none;">
-        <div class="cc-modal-content">
-            <h2>Admin Login</h2>
-            <form id="admin-login-form">
-                <input type="text" id="admin-username" placeholder="Username" class="input-field" required />
-                <input type="password" id="admin-password" placeholder="Password" class="input-field" required />
-                <button type="submit" class="button primary">Login</button>
-                <button type="button" id="admin-cancel" class="button outline">Cancel</button>
+        <div class="cc-modal-content" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
+            <h2 id="admin-login-title" style="margin-bottom:1.2rem; color:var(--primary);">Admin Login</h2>
+            <form id="admin-login-form" autocomplete="off">
+                <input type="text" id="admin-username" placeholder="Username" class="input-field" required aria-label="Admin Username" />
+                <input type="password" id="admin-password" placeholder="Password" class="input-field" required aria-label="Admin Password" />
+                <div style="display:flex; gap:0.7em; margin-bottom:0.5em;">
+                    <button type="submit" class="button primary" style="flex:1;">Login</button>
+                    <button type="button" id="admin-cancel" class="button outline" style="flex:1;">Cancel</button>
+                </div>
                 <div id="admin-login-error" class="error-message" style="display:none;"></div>
             </form>
         </div>
