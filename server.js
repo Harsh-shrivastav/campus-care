@@ -4,6 +4,8 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import multer from 'multer';
+import path from 'path';
 
 config();
 
@@ -21,6 +23,10 @@ app.use(express.json());
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static('.'));
+
+// Multer setup for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Configure Gemini API
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -235,12 +241,14 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Gemini Proxy Server listening at http://localhost:${port}`);
 }); 
-app.post('/api/issues', async (req, res) => {
-  const { issue_type, description, facility_id } = req.body;
-  if (!issue_type || !facility_id) {
-    return res.status(400).json({ error: 'issue_type and facility_id are required.' });
-  }
+// POST /api/issues (with image upload)
+app.post('/api/issues', upload.single('image'), async (req, res) => {
   try {
+    const { issue_type, description, facility_id } = req.body;
+    if (!issue_type || !facility_id) {
+      return res.status(400).json({ error: 'issue_type and facility_id are required.' });
+    }
+
     // Generate priority using Gemini
     let geminiPriority = 'BLUE';
     try {
@@ -248,13 +256,34 @@ app.post('/api/issues', async (req, res) => {
     } catch (e) {
       console.warn('Gemini priority generation failed, defaulting to BLUE:', e);
     }
-    // Map Gemini priority to allowed values
     let priority = 'Medium';
     if (geminiPriority === 'RED') priority = 'Critical';
     else if (geminiPriority === 'GREEN') priority = 'High';
     else if (geminiPriority === 'BLUE') priority = 'Low';
 
-    // Insert into Supabase with mapped priority and status 'Reported'
+    // Handle image upload to Supabase Storage
+    let image_url = null;
+    if (req.file) {
+      const fileExt = path.extname(req.file.originalname);
+      const fileName = `issue_${Date.now()}${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('issue-images')
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: false
+        });
+      if (error) {
+        console.error('Supabase Storage upload error:', error);
+        return res.status(500).json({ error: 'Failed to upload image.' });
+      }
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('issue-images')
+        .getPublicUrl(fileName);
+      image_url = publicUrlData.publicUrl;
+    }
+
+    // Insert into Supabase with mapped priority, status 'Reported', and image_url
     const { data, error } = await supabase
       .from('issues')
       .insert([
@@ -264,6 +293,7 @@ app.post('/api/issues', async (req, res) => {
           facility_id,
           status: 'Reported',
           priority,
+          image_url
         },
       ])
       .select();

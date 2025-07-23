@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return {
                     id: issue.id,
                     issueType: issue.issue_type,
-                    location: facility.displayName,
+                    location: facility.name || facility.displayName || 'Unknown',
                     facilityId: issue.facility_id,
                     facilityDetails: facility,
                     description: issue.description || '',
@@ -174,7 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     status: issue.status || 'Reported',
                     timestamp: issue.created_at,
                     updated_at: issue.updated_at || null,
-                    action_remarks: issue.action_remarks || ''
+                    action_remarks: issue.action_remarks || '',
+                    image_url: issue.image_url || null // Add image_url to the report object
                 };
             });
             
@@ -740,6 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="report-card-timestamp">${new Date(report.timestamp).toLocaleString()}</div>
                 </div>
                 <div class="report-card-location">${report.location}</div>
+                ${report.image_url ? `<div class='report-card-image'><img src='${report.image_url}' alt='Issue Image' style='max-width: 100%; max-height: 180px; border-radius: 0.5rem; margin: 0.5rem 0;'/></div>` : ''}
                 <div class="report-card-description">${report.description || 'No description provided.'}</div>
                 <div class="report-card-badges">
                     <span class="badge priority-${priorityClass}">${report.priority}</span>

@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit-report-button');
     const successAlert = document.getElementById('success-alert');
     const submitErrorAlert = document.getElementById('submit-error-alert');
+    const imageInput = document.getElementById('issue-image');
+    const imagePreview = document.getElementById('image-preview');
 
     const issueTypes = [
         { value: "dirty_restroom", label: "Dirty restroom" },
@@ -108,6 +110,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Image preview logic
+    imageInput.addEventListener('change', () => {
+        imagePreview.innerHTML = '';
+        const file = imageInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Selected Image';
+                img.style.maxWidth = '200px';
+                img.style.maxHeight = '150px';
+                img.style.borderRadius = '0.5rem';
+                img.style.marginTop = '0.5rem';
+                imagePreview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     // Helper to get query parameter from URL
     function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -147,13 +169,21 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Submitting...';
         successAlert.style.display = 'none';
 
-        const formData = {
+        // Use FormData for multipart/form-data
+        const formData = new FormData();
+        formData.append('issue_type', issueTypeSelect.value);
+        formData.append('facility_id', facilityIdInput.value);
+        formData.append('description', descriptionTextarea.value);
+        if (imageInput.files[0]) {
+            formData.append('image', imageInput.files[0]);
+        }
+
+        // Validate required fields (client-side)
+        const validationResult = ReportValidationService.validateReport({
             issue_type: issueTypeSelect.value,
             facility_id: facilityIdInput.value,
-            description: descriptionTextarea.value,
-        };
-
-        const validationResult = ReportValidationService.validateReport(formData);
+            description: descriptionTextarea.value
+        });
 
         if (!validationResult.isValid) {
             for (const field in validationResult.errors) {
@@ -165,20 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Sanitize data before sending to backend
-            const sanitizedData = {
-                issue_type: ReportValidationService.sanitizeInput(formData.issue_type),
-                facility_id: ReportValidationService.sanitizeInput(formData.facility_id),
-                description: formData.description ? ReportValidationService.sanitizeInput(formData.description) : undefined,
-            };
-
-            // Send data to backend to insert into Supabase
+            // Send FormData to backend
             const response = await fetch('http://localhost:3001/api/issues', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(sanitizedData),
+                body: formData
+                // Content-Type is set automatically by the browser
             });
 
             if (!response.ok) {
@@ -195,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset form after successful submission
             reportForm.reset();
             issueTypeSelect.value = ""; // Explicitly reset select
+            imagePreview.innerHTML = '';
 
         } catch (error) {
             console.error("Error submitting issue:", error);
